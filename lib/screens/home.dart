@@ -1,4 +1,3 @@
-import 'package:hexcolor/hexcolor.dart';
 import 'package:testflutter/constants/app_constants.dart';
 import 'package:testflutter/widgets/left_bar.dart';
 import 'package:testflutter/widgets/right_bar.dart';
@@ -12,6 +11,11 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  TextEditingController _heightController = TextEditingController();
+  TextEditingController _weightController = TextEditingController();
+  double _bmiResult = 0;
+  String _textResult = "";
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -35,14 +39,30 @@ class _HomeScreenState extends State<HomeScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    newMethod("height"),
-                    newMethod("weight"),
+                    newMethod("height", _heightController),
+                    newMethod("weight", _weightController),
                   ],
                 ),
                 SizedBox(
                   height: 30,
                 ),
-                Container(
+                GestureDetector(
+                  onTap: () {
+                    double _h = double.parse(_heightController.text);
+                    double _w = double.parse(_weightController.text);
+                    print(_bmiResult = _w / (_h * _h));
+
+                    setState(() {
+                      _bmiResult = _w / (_h * _h);
+                      if (_bmiResult > 25) {
+                        _textResult = "you\'re over weight";
+                      } else if (_bmiResult >= 18.5 && _bmiResult <= 25) {
+                        _textResult = "you have normal weight";
+                      } else {
+                        _textResult = "you\'re under weight";
+                      }
+                    });
+                  },
                   child: Text(
                     "calculate",
                     style: TextStyle(
@@ -53,11 +73,11 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
                 SizedBox(
-                  height: 50,
+                  height: 30,
                 ),
                 Container(
                   child: Text(
-                    "10",
+                    _bmiResult.toStringAsFixed(2),
                     style: TextStyle(
                       fontSize: 90,
                       color: accentHexColor,
@@ -67,13 +87,16 @@ class _HomeScreenState extends State<HomeScreen> {
                 SizedBox(
                   height: 30,
                 ),
-                Container(
-                  child: Text(
-                    "Normal weight",
-                    style: TextStyle(
-                      fontSize: 32,
-                      fontWeight: FontWeight.w400,
-                      color: accentHexColor,
+                Visibility(
+                  visible: _textResult.isNotEmpty,
+                  child: Container(
+                    child: Text(
+                      _textResult,
+                      style: TextStyle(
+                        fontSize: 32,
+                        fontWeight: FontWeight.w400,
+                        color: accentHexColor,
+                      ),
                     ),
                   ),
                 ),
@@ -90,11 +113,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 LeftBar(barWidth: 30),
                 SizedBox(
-                  height: 20,
+                  height: 10,
                 ),
                 RightBar(barWidth: 40),
                 SizedBox(
-                  height: 50,
+                  height: 30,
                 ),
                 RightBar(barWidth: 30)
               ],
@@ -103,10 +126,11 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Container newMethod(String txthint) {
+  Container newMethod(String txthint, TextEditingController _ctr) {
     return Container(
       width: 130,
       child: TextField(
+        controller: _ctr,
         style: TextStyle(
           fontSize: 42,
           fontWeight: FontWeight.w300,
